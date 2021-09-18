@@ -1,6 +1,6 @@
 {
   "name": "@emeals/sls-sdk",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "repository": "git@github-emeals:em-cdleon/sls-sdk.git",
