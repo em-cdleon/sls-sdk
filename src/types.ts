@@ -35,7 +35,7 @@ export type ApiGatewayEventHandlerFactoryInputFn<T={}> = (
   event: APIGatewayProxyEvent
 ) => Promise<ApiGatewayEventHandlerInputFnOutput<T>>
 
-export type HandlerInputFn<T={}> = ApiGatewayEventHandlerFactoryInputFn<T>
+export type AGHandlerInputFn<T={}> = ApiGatewayEventHandlerFactoryInputFn<T>
 
 export type ApiGatewayEventHandlerFactory = <T>(
   fn: ApiGatewayEventHandlerFactoryInputFn<T>

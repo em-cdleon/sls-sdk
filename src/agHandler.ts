@@ -5,8 +5,10 @@ import { config } from './sentry'
 
 AWSLambda.init(config)
 
-const handler = (fn: ApiGatewayEventHandlerFactoryInputFn) => AWSLambda.wrapHandler(
+const agHandler = (
+  fn: ApiGatewayEventHandlerFactoryInputFn
+) => AWSLambda.wrapHandler(
   apiGatewayEventHandlerFactory(fn)
 )
 
-export default handler
+export default agHandler
