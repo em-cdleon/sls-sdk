@@ -1,6 +1,6 @@
 {
   "name": "@emeals/sls-sdk",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "Emeals",
   "license": "MIT",
   "repository": "git@github-emeals:em-cdleon/sls-sdk.git",
@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc",
     "package": "yarn pack",
-    "release": "yarn publish --scope public"
+    "release": "yarn build && yarn publish --scope public"
   },
   "dependencies": {
     "@sentry/serverless": "^6.12.0",
