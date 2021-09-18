@@ -7,13 +7,13 @@ import type {
 export default class Request<H extends APIGatewayProxyEventHeaders, B = {}, Q extends APIGatewayProxyEventQueryStringParameters = {}> {
   private readonly _body: B | null
   private readonly _headers: H
-  private readonly _query: Q | null
+  private readonly _query: Q | null | undefined
 
   constructor (
     event: APIGatewayProxyEvent,
     headersValidator: (headers: H | null | undefined) => H,
     bodyValidator: null | ((body: string | null | undefined) => B),
-    queryValidator: null | ((query: Q | null | undefined) => Q)
+    queryValidator: null | ((query: Q | null | undefined) => Q | null | undefined)
   ) {
     this._headers = headersValidator(event.headers as H)
 
@@ -38,7 +38,7 @@ export default class Request<H extends APIGatewayProxyEventHeaders, B = {}, Q ex
     return this._headers
   }
 
-  get query (): Q | null {
+  get query (): Q | null | undefined {
     return this._query
   }
 }
