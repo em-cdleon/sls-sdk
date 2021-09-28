@@ -1,4 +1,5 @@
 export { default as agHandler } from './agHandler'
+export { default as auHandler } from './auHandler'
 export {
   default as apiGatewayEventHandlerFactory
 } from './apiGatewayEventHandlerFactory'
