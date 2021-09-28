@@ -1,4 +1,5 @@
 import type {
+  APIGatewayAuthorizerEvent,
   APIGatewayProxyEvent,
   APIGatewayProxyEventHeaders,
   APIGatewayProxyEventQueryStringParameters
@@ -15,11 +16,23 @@ export interface InputHeaders extends APIGatewayProxyEventHeaders {
   [index: string]: string
 }
 
+export type ApiGatewayEventHandlerFactory = <T>(
+  fn: ApiGatewayEventHandlerFactoryInputFn<T>
+) => ApiGatewayEventHandler
+
+export type ApiGatewayEventHandlerFactoryInputFn<T = {}> = (
+  event: APIGatewayProxyEvent
+) => Promise<ApiGatewayEventHandlerInputFnOutput<T>>
+
 export interface ApiGatewayEventHandlerInputFnOutput<T={}> {
   data?: T
   message?: string
   statusCode?: number
 }
+
+export type ApiGatewayEventHandler = (
+  event: APIGatewayProxyEvent
+) => Promise<ApiGatewayEventHandlerResponse>
 
 export interface ApiGatewayEventHandlerResponse {
   body: string
@@ -27,19 +40,7 @@ export interface ApiGatewayEventHandlerResponse {
   statusCode: StatusCodes
 }
 
-export type ApiGatewayEventHandler = (
-  event: APIGatewayProxyEvent
-) => Promise<ApiGatewayEventHandlerResponse>
-
-export type ApiGatewayEventHandlerFactoryInputFn<T={}> = (
-  event: APIGatewayProxyEvent
-) => Promise<ApiGatewayEventHandlerInputFnOutput<T>>
-
 export type AGHandlerInputFn<T={}> = ApiGatewayEventHandlerFactoryInputFn<T>
-
-export type ApiGatewayEventHandlerFactory = <T>(
-  fn: ApiGatewayEventHandlerFactoryInputFn<T>
-) => ApiGatewayEventHandler
 
 export interface ResponseBody<T={}> {
   data?: T
@@ -62,13 +63,47 @@ export type BodyValidator = <T>(
   schema: JSONSchemaType<T>,
   errorParser?: ErrorParser
 ) => T
+
 export type HeadersValidator = <T extends APIGatewayProxyEventHeaders>(
   headers: T | null | undefined,
   schema: JSONSchemaType<T>,
   errorParser?: ErrorParser
 ) => T
+
 export type QueryValidator = <T extends APIGatewayProxyEventQueryStringParameters>(
   query: T | null | undefined,
   schema: JSONSchemaType<T>,
   errorParser?: ErrorParser
 ) => T
+
+export interface Statement {
+  Action: string
+  Effect: string
+  Resource: string
+}
+
+export interface GenerateAuthorizerPolicyFnOutput {
+  principalId: string
+  policyDocument: {
+    Version: string
+    Statement: Statement[]
+  }
+}
+
+export type AuthorizerEventHandlerFactory = (
+  fn: AuthorizerEventHandlerFactoryInputFn
+) => AuthorizerEventHandler
+
+export type AuthorizerEventHandlerFactoryInputFn = (
+  event: APIGatewayAuthorizerEvent
+) => Promise<AuthorizerEventHandlerInputFnOutput>
+
+export type AuthorizerEventHandlerInputFnOutput = 'Allow' | 'Deny'
+
+export type AuthorizerEventHandler = (
+  event: APIGatewayAuthorizerEvent
+) => Promise<AuthorizerEventHandlerResponse>
+
+export type AuthorizerEventHandlerResponse = GenerateAuthorizerPolicyFnOutput
+
+export type AuHandlerInputFn = AuthorizerEventHandlerFactoryInputFn
