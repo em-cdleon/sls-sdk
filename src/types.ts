@@ -1,8 +1,8 @@
 import type {
-  APIGatewayAuthorizerEvent,
   APIGatewayProxyEvent,
   APIGatewayProxyEventHeaders,
-  APIGatewayProxyEventQueryStringParameters
+  APIGatewayProxyEventQueryStringParameters,
+  APIGatewayRequestAuthorizerEvent
 } from 'aws-lambda'
 import type { JSONSchemaType, ErrorObject, ValidateFunction } from 'ajv'
 import type { StatusCodes } from 'http-status-codes'
@@ -95,13 +95,13 @@ export type AuthorizerEventHandlerFactory = (
 ) => AuthorizerEventHandler
 
 export type AuthorizerEventHandlerFactoryInputFn = (
-  event: APIGatewayAuthorizerEvent
+  event: APIGatewayRequestAuthorizerEvent
 ) => Promise<AuthorizerEventHandlerInputFnOutput>
 
 export type AuthorizerEventHandlerInputFnOutput = 'Allow' | 'Deny'
 
 export type AuthorizerEventHandler = (
-  event: APIGatewayAuthorizerEvent
+  event: APIGatewayRequestAuthorizerEvent
 ) => Promise<AuthorizerEventHandlerResponse>
 
 export type AuthorizerEventHandlerResponse = GenerateAuthorizerPolicyFnOutput

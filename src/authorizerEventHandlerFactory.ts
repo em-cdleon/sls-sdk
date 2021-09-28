@@ -1,4 +1,4 @@
-import type { APIGatewayAuthorizerEvent } from 'aws-lambda'
+import type { APIGatewayRequestAuthorizerEvent } from 'aws-lambda'
 import type {
   AuthorizerEventHandlerFactory,
   AuthorizerEventHandlerResponse
@@ -10,7 +10,7 @@ const authorizerEventHandler: AuthorizerEventHandlerFactory = (
   fn
 ) => {
   const handler = async (
-    event: APIGatewayAuthorizerEvent
+    event: APIGatewayRequestAuthorizerEvent
   ): Promise<AuthorizerEventHandlerResponse> => {
     try {
       const r = await fn(event)
