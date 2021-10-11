@@ -2,28 +2,28 @@ import Ajv, { JSONSchemaType } from 'ajv'
 import defaultErrorParser from './errorParser'
 import type {
   ErrorParser,
-  QueryValidator
+  ParamsValidator
 } from './types'
 import ServiceError from './ServiceError'
 import { StatusCodes } from 'http-status-codes'
 
 const ajv = new Ajv({ allErrors: true })
 
-const queryValidator: QueryValidator = <Q>(
-  query: Q | null | undefined,
-  schema: JSONSchemaType<Q>,
+const paramsValidator: ParamsValidator = <P>(
+  params: P | null | undefined,
+  schema: JSONSchemaType<P>,
   errorParser?: ErrorParser
-): Q => {
-  const validate = ajv.compile<Q>(schema)
+): P => {
+  const validate = ajv.compile<P>(schema)
 
-  if (!validate(query)) {
+  if (!validate(params)) {
     const errors = validate.errors == null ? [] : validate.errors
 
     let parsedErrorMessage = ''
     if (errorParser !== undefined) {
       parsedErrorMessage = errorParser(errors, validate)
     } else {
-      parsedErrorMessage = `Query error: ${defaultErrorParser(errors)}`
+      parsedErrorMessage = `Params error: ${defaultErrorParser(errors)}`
     }
 
     throw new ServiceError(
@@ -32,7 +32,7 @@ const queryValidator: QueryValidator = <Q>(
     )
   }
 
-  return query
+  return params
 }
 
-export default queryValidator
+export default paramsValidator

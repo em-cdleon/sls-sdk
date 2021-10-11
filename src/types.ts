@@ -76,6 +76,12 @@ export type QueryValidator = <T extends APIGatewayProxyEventQueryStringParameter
   errorParser?: ErrorParser
 ) => T
 
+export type ParamsValidator = <T extends APIGatewayProxyEventHeaders>(
+  headers: T | null | undefined,
+  schema: JSONSchemaType<T>,
+  errorParser?: ErrorParser
+) => T
+
 export interface Statement {
   Action: string
   Effect: string

@@ -1,19 +1,27 @@
 import type {
   APIGatewayProxyEvent,
   APIGatewayProxyEventHeaders,
-  APIGatewayProxyEventQueryStringParameters
+  APIGatewayProxyEventQueryStringParameters,
+  APIGatewayProxyEventPathParameters
 } from 'aws-lambda'
 
-export default class Request<H extends APIGatewayProxyEventHeaders, B = {}, Q extends APIGatewayProxyEventQueryStringParameters = {}> {
+export default class Request<
+  H extends APIGatewayProxyEventHeaders,
+  B = {},
+  Q extends APIGatewayProxyEventQueryStringParameters = {},
+  P extends APIGatewayProxyEventPathParameters = {}
+> {
   private readonly _body: B | null
   private readonly _headers: H
   private readonly _query: Q | null | undefined
+  private readonly _params: P | null | undefined
 
   constructor (
     event: APIGatewayProxyEvent,
     headersValidator: (headers: H | null | undefined) => H,
     bodyValidator: null | ((body: string | null | undefined) => B),
-    queryValidator: null | ((query: Q | null | undefined) => Q | null | undefined)
+    queryValidator: null | ((query: Q | null | undefined) => Q | null | undefined),
+    paramsValidator: null | ((params: P | null | undefined) => P | null | undefined)
   ) {
     this._headers = headersValidator(event.headers as H)
 
@@ -28,6 +36,12 @@ export default class Request<H extends APIGatewayProxyEventHeaders, B = {}, Q ex
     } else {
       this._query = null
     }
+
+    if (paramsValidator !== null) {
+      this._params = paramsValidator(event.pathParameters as P)
+    } else {
+      this._params = null
+    }
   }
 
   get body (): B | null {
@@ -36,6 +50,10 @@ export default class Request<H extends APIGatewayProxyEventHeaders, B = {}, Q ex
 
   get headers (): H {
     return this._headers
+  }
+
+  get params (): P | null | undefined {
+    return this._params
   }
 
   get query (): Q | null | undefined {
