@@ -16,8 +16,19 @@ export interface InputHeaders extends APIGatewayProxyEventHeaders {
   [index: string]: string
 }
 
+export interface ApiGatewayEventHandlerFactoryOptionMetrics {
+  endpoint: string
+  namespace: string
+  service: string
+}
+
+export interface ApiGatewayEventHandlerFactoryOptions {
+  metrics?: ApiGatewayEventHandlerFactoryOptionMetrics
+}
+
 export type ApiGatewayEventHandlerFactory = <T>(
-  fn: ApiGatewayEventHandlerFactoryInputFn<T>
+  fn: ApiGatewayEventHandlerFactoryInputFn<T>,
+  options?: ApiGatewayEventHandlerFactoryOptions
 ) => ApiGatewayEventHandler
 
 export type ApiGatewayEventHandlerFactoryInputFn<T = {}> = (

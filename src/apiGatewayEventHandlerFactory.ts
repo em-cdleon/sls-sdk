@@ -1,21 +1,41 @@
-import type { APIGatewayProxyEvent } from 'aws-lambda'
 import type {
   ApiGatewayEventHandlerFactory,
+  ApiGatewayEventHandlerFactoryOptionMetrics,
   ApiGatewayEventHandlerResponse,
   ResponseBody
 } from './types'
+import type { APIGatewayProxyEvent } from 'aws-lambda'
 import isError from './isError'
 import isServiceError from './isServiceError'
+import {
+  metricsErrors,
+  metricsInit,
+  metricsRequestTime
+} from 'metrics'
+import { metricScope } from 'aws-embedded-metrics'
 import { ReasonPhrases, StatusCodes } from 'http-status-codes'
 import Response from './Response'
 import * as Sentry from '@sentry/serverless'
 
-const apiGatewayEventHandler: ApiGatewayEventHandlerFactory = (
-  fn
+
+const apiGatewayEventHandler = metricScope((metrics): ApiGatewayEventHandlerFactory => (
+  fn,
+  options
 ) => {
   const handler = async (
     event: APIGatewayProxyEvent
-  ): Promise<ApiGatewayEventHandlerResponse> => {
+    ): Promise<ApiGatewayEventHandlerResponse> => {
+    const initTime = Date.now()
+
+    let metricsOpts: ApiGatewayEventHandlerFactoryOptionMetrics | undefined = undefined
+    if (options && options.metrics) {
+      metricsOpts = options.metrics
+    }
+
+    if (metricsOpts) {
+      metricsInit(metrics, metricsOpts)
+    } 
+
     let statusCode = StatusCodes.OK
     const responseBody: ResponseBody = {
       message: ReasonPhrases.OK
@@ -27,12 +47,16 @@ const apiGatewayEventHandler: ApiGatewayEventHandlerFactory = (
       if (r.message !== undefined) { responseBody.message = r.message }
       if (r.data !== undefined) { responseBody.data = r.data }
     } catch (error) {
+      if (metricsOpts) {
+        metricsErrors(metrics, error)
+      }
+      let statusCode = StatusCodes.INTERNAL_SERVER_ERROR
+      responseBody.message = 'Unknown error'
+
       if (isError(error)) {
         responseBody.message = error.message
         if (isServiceError(error)) {
           statusCode = error.statusCode
-        } else {
-          statusCode = StatusCodes.INTERNAL_SERVER_ERROR
         }
         if (statusCode >= StatusCodes.INTERNAL_SERVER_ERROR) {
           const errorMessage: string = error.toString()
@@ -40,21 +64,25 @@ const apiGatewayEventHandler: ApiGatewayEventHandlerFactory = (
           console.error(errorMessage)
           responseBody.message = ReasonPhrases.INTERNAL_SERVER_ERROR
         }
-        const errorResponse = new Response(statusCode, responseBody)
-        return errorResponse.send()
-      } else {
-        statusCode = StatusCodes.INTERNAL_SERVER_ERROR
-        responseBody.message = 'Unknown error'
-        const errorResponse = new Response(statusCode, responseBody)
-        return errorResponse.send()
       }
+
+      const errorResponse = new Response(statusCode, responseBody)
+
+      if (metricsOpts) {
+        metricsRequestTime(metrics, initTime)
+      }
+      return errorResponse.send()
     }
 
     const response = new Response(statusCode, responseBody)
+
+    if (metricsOpts) {
+      metricsRequestTime(metrics, initTime)
+    }
     return response.send()
   }
 
   return handler
-}
+})
 
 export default apiGatewayEventHandler
