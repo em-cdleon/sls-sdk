@@ -11,7 +11,7 @@ import {
   metricsErrors,
   metricsInit,
   metricsRequestTime
-} from 'metrics'
+} from './metrics'
 import { metricScope } from 'aws-embedded-metrics'
 import { ReasonPhrases, StatusCodes } from 'http-status-codes'
 import Response from './Response'
