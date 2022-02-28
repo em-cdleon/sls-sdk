@@ -18,13 +18,13 @@ import Response from './Response'
 import * as Sentry from '@sentry/serverless'
 
 
-const apiGatewayEventHandler = metricScope((metrics): ApiGatewayEventHandlerFactory => (
+const apiGatewayEventHandler: ApiGatewayEventHandlerFactory = (
   fn,
   options
 ) => {
-  const handler = async (
+  const handler = metricScope((metrics) => async (
     event: APIGatewayProxyEvent
-    ): Promise<ApiGatewayEventHandlerResponse> => {
+  ): Promise<ApiGatewayEventHandlerResponse> => {
     const initTime = Date.now()
 
     let metricsOpts: ApiGatewayEventHandlerFactoryOptionMetrics | undefined = undefined
@@ -80,9 +80,9 @@ const apiGatewayEventHandler = metricScope((metrics): ApiGatewayEventHandlerFact
       metricsRequestTime(metrics, initTime)
     }
     return response.send()
-  }
+  })
 
   return handler
-})
+}
 
 export default apiGatewayEventHandler

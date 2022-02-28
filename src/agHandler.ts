@@ -9,7 +9,7 @@ const agHandler = async (
   fn: ApiGatewayEventHandlerFactoryInputFn,
   options?: ApiGatewayEventHandlerFactoryOptions
 ) => AWSLambda.wrapHandler(
-  await apiGatewayEventHandlerFactory(fn, options)
+  apiGatewayEventHandlerFactory(fn, options)
 )
 
 export default agHandler
