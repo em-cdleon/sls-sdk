@@ -5,7 +5,7 @@ import { config } from './sentry'
 
 AWSLambda.init(config)
 
-const agHandler = async (
+const agHandler = (
   fn: ApiGatewayEventHandlerFactoryInputFn,
   options?: ApiGatewayEventHandlerFactoryOptions
 ) => AWSLambda.wrapHandler(

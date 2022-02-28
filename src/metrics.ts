@@ -13,7 +13,7 @@ export const metricsInit = (metrics: MetricsLogger, {
   service
 }: ApiGatewayEventHandlerFactoryOptionMetrics) => {
   metrics.setNamespace(namespace)
-  metrics.putDimensions({ service })
+  metrics.putDimensions({ Service: service })
   metrics.putMetric('REQUEST', 1)
 }
 
